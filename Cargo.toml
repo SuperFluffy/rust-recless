@@ -1,0 +1,10 @@
+[package]
+name = "rust-recursive-least-squares"
+version = "0.1.0"
+authors = ["Richard Janis Goldschmidt <janis.beckert@gmail.com>"]
+
+[dependencies]
+ndarray = "0.9"
+
+[features]
+blas = ["ndarray/blas"]
