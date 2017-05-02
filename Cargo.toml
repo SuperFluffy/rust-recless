@@ -2,7 +2,14 @@
 name = "recless"
 version = "0.1.0"
 authors = ["Richard Janis Goldschmidt <janis.beckert@gmail.com>"]
+license = "MIT/Apache 2.0"
+
 repository = "https://github.com/SuperFluffy/rust-recless"
+
+description = "A Rust implementation of the recursive least squares algorithm with exponential forgetting"
+categories = ["algorithms", "science"]
+keywords = ["filters", "learning", "regression", "data", "kalman"]
+
 
 [lib]
 name = "recless"
