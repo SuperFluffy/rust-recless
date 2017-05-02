@@ -1,7 +1,11 @@
 [package]
-name = "rust-recursive-least-squares"
+name = "recless"
 version = "0.1.0"
 authors = ["Richard Janis Goldschmidt <janis.beckert@gmail.com>"]
+repository = "https://github.com/SuperFluffy/rust-recless"
+
+[lib]
+name = "recless"
 
 [dependencies]
 ndarray = "0.9"
