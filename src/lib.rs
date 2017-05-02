@@ -116,22 +116,27 @@ impl<F: NdFloat> Rls<F> {
 }
 
 impl<T> Rls<T> {
+    /// Returns a reference to the gain vector.
     pub fn gain_ref(&self) -> &Array1<T> {
         &self.gain
     }
 
+    /// Returns a reference to the inverse correlation matrix.
     pub fn inverse_correlation_ref(&self) -> &Array2<T> {
         &self.inverse_correlation
     }
 
+    /// Returns a reference to the inverse forgetting factor.
     pub fn inv_forgetting_factor_ref(&self) -> &T {
         &self.inv_forgetting_factor
     }
 
+    /// Returns a reference to the (tap) weight vector.
     pub fn weight_ref(&self) -> &Array1<T> {
         &self.weight
     }
 
+    /// Returns a refernce to the prior error.
     pub fn prior_error_ref(&self) -> &T {
         &self.prior_error
     }
