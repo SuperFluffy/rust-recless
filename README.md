@@ -6,6 +6,12 @@ details.
 
 It is using `ndarray` for its vector and matrix data structures.
 
+# Recent releases
+
++ 0.1.1: use `ndarray`s `Zip`/`NdProducer` functionality via the `azip!` macro for performance;
++ 0.1.0: initial release.
+
+
 # License
 
 Dual-licensed under Apache 2.0 and MIT licenses to be compatible with the Rust project.
