@@ -64,7 +64,8 @@ impl<F: NdFloat> Rls<F> {
         let gain = Array1::zeros(n);
         let prior_error = zero;
 
-        let inverse_correlation = Array2::from_elem([n,n], one/initialization_factor);
+        let mut inverse_correlation = Array2::eye(n);
+        inverse_correlation *= one/initialization_factor;
 
         let temp_a = Array2::zeros([n,n]);
         let temp_b = Array2::zeros([n,n]);
