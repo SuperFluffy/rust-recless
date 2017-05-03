@@ -1,3 +1,4 @@
+#[macro_use(azip)]
 extern crate ndarray;
 
 use ndarray::prelude::*;
@@ -103,11 +104,10 @@ impl<F: NdFloat> Rls<F> {
         // Update the tap weight.
         self.weight.scaled_add(self.prior_error, &self.gain);
 
-        // Update the inverse correlation matrix.
-        for (mut row,a) in self.temp_a.genrows_mut().into_iter().zip(self.gain.iter()) {
-            row.assign(input);
-            row *= *a;
-        }
+        azip!(mut row (self.temp_a.genrows_mut()), gain (&self.gain) in {
+            azip!(mut row, input (input) in {
+                *row = gain * input;
+        })});
 
         general_mat_mul(one, &self.temp_a, &self.inverse_correlation, zero, &mut self.temp_b);
         self.inverse_correlation -= &self.temp_b;
