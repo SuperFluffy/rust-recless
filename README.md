@@ -8,6 +8,7 @@ It is using `ndarray` for its vector and matrix data structures.
 
 # Recent releases
 
++ 0.1.2: the inverse correlation matrix is now correctly initialized as δ^{-1} · 𝟙
 + 0.1.1: use `ndarray`s `Zip`/`NdProducer` functionality via the `azip!` macro for performance;
 + 0.1.0: initial release.
 
