@@ -93,7 +93,7 @@ impl<F: NdFloat> Rls<F> {
             one,
             &self.inverse_correlation,
             input,
-            one,
+            zero,
             &mut self.gain
         );
         let c = self.inv_forgetting_factor + self.gain.dot(&self.gain);
