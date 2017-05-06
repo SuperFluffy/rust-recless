@@ -24,6 +24,7 @@ use ndarray::linalg::{
 /// forgetting factor λ < 1 and shifting down old values of the input vector manually, the user can
 /// get this algorithm to behave accordingly.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone,Debug)]
 pub struct Rls<F> {
 
     /// The inverse forgetting factor λ^{-1}.
