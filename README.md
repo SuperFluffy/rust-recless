@@ -8,6 +8,10 @@ It is using `ndarray` for its vector and matrix data structures.
 
 # Recent releases
 
++ 0.1.3:
+    + the gain vector is now correctly calculated and not based on its old value;
+    + the inverse correlation matrix is updated 10 times faster by moving from `?gemm` to `?ger`, the outer
+    vector product;
 + 0.1.2: the inverse correlation matrix is now correctly initialized as δ^{-1} · 𝟙
 + 0.1.1: use `ndarray`s `Zip`/`NdProducer` functionality via the `azip!` macro for performance;
 + 0.1.0: initial release.
