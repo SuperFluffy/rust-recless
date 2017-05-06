@@ -1,4 +1,5 @@
-#[macro_use(azip)]
+extern crate blas;
+
 extern crate ndarray;
 
 #[cfg(feature = "serde")]
@@ -11,7 +12,6 @@ extern crate serde_derive;
 use ndarray::prelude::*;
 use ndarray::Data;
 use ndarray::linalg::{
-    general_mat_mul,
     general_mat_vec_mul,
 };
 
@@ -49,8 +49,8 @@ pub struct Rls<F> {
     prior_error: F,
 
     // Two scratch matrices used for for update of the inverse correlation matrix.
-    temp_a: Array2<F>,
-    temp_b: Array2<F>,
+    temp_mat: Array2<F>,
+    temp_vec: Array1<F>,
 }
 
 impl<F: NdFloat> Rls<F> {
@@ -77,8 +77,8 @@ impl<F: NdFloat> Rls<F> {
         let mut inverse_correlation = Array2::eye(n);
         inverse_correlation *= one/initialization_factor;
 
-        let temp_a = Array2::zeros([n,n]);
-        let temp_b = Array2::zeros([n,n]);
+        let temp_mat = Array2::zeros([n,n]);
+        let temp_vec = Array1::zeros(n);
 
         Rls {
             inv_forgetting_factor,
@@ -86,45 +86,67 @@ impl<F: NdFloat> Rls<F> {
             inverse_correlation,
             weight,
             prior_error,
-            temp_a,
-            temp_b,
+            temp_mat,
+            temp_vec,
         }
     }
-
-    /// Performs a recursive update of inverse correlation matrix and weight vector.
-    pub fn update<S>(&mut self, input: &ArrayBase<S, Ix1>, target: F)
-        where S: Data<Elem = F>
-    {
-        let one = F::one();
-        let zero = F::zero();
-
-        // Update the gain vector.
-        general_mat_vec_mul(
-            one,
-            &self.inverse_correlation,
-            input,
-            zero,
-            &mut self.gain
-        );
-        let c = self.inv_forgetting_factor + self.gain.dot(&self.gain);
-        self.gain /= c;
-
-        // Calculate the prior error using the not yet updated tap weight.
-        self.prior_error = target - self.weight.dot(&input);
-
-        // Update the tap weight.
-        self.weight.scaled_add(self.prior_error, &self.gain);
-
-        azip!(mut row (self.temp_a.genrows_mut()), gain (&self.gain) in {
-            azip!(mut row, input (input) in {
-                *row = gain * input;
-        })});
-
-        general_mat_mul(one, &self.temp_a, &self.inverse_correlation, zero, &mut self.temp_b);
-        self.inverse_correlation -= &self.temp_b;
-        self.inverse_correlation *= self.inv_forgetting_factor;
-    }
 }
+
+macro_rules! impl_update {
+    ($t:ty, $fn:expr) => {
+        impl Rls<$t> {
+            /// Performs a recursive update of inverse correlation matrix and weight vector.
+            pub fn update<S>(&mut self, input: &ArrayBase<S, Ix1>, target: $t)
+                where S: Data<Elem = $t>
+            {
+                // Update the gain vector.
+                general_mat_vec_mul(
+                    1.0,
+                    &self.inverse_correlation,
+                    input,
+                    0.0,
+                    &mut self.gain
+                );
+                let c = self.inv_forgetting_factor + input.dot(&self.gain);
+
+                self.gain /= c;
+
+                // Calculate the prior error using the not yet updated tap weight.
+                self.prior_error = target - self.weight.dot(&input);
+
+                // Update the tap weight.
+                self.weight.scaled_add(self.prior_error, &self.gain);
+
+                general_mat_vec_mul(
+                    1.0,
+                    &self.inverse_correlation.t(),
+                    input,
+                    0.0,
+                    &mut self.temp_vec
+                );
+
+                self.temp_mat.fill(0.0);
+                let temp_mat_stride = self.temp_mat.strides()[0];
+                $fn(
+                    blas::c::Layout::RowMajor,
+                    self.gain.dim() as i32,
+                    self.temp_vec.dim() as i32,
+                    1.0,
+                    self.gain.as_slice().unwrap(),
+                    self.gain.strides()[0] as i32,
+                    self.temp_vec.as_slice().unwrap(),
+                    self.gain.strides()[0] as i32,
+                    self.temp_mat.as_slice_mut().unwrap(),
+                    temp_mat_stride as i32,
+                );
+                self.inverse_correlation -= &self.temp_mat;
+                self.inverse_correlation *= self.inv_forgetting_factor;
+            }
+        }
+}}
+
+impl_update!(f32, blas::c::sger);
+impl_update!(f64, blas::c::dger);
 
 impl<T> Rls<T> {
 

@@ -15,7 +15,11 @@ keywords = ["filters", "learning", "regression", "data", "kalman"]
 name = "recless"
 
 [dependencies]
-ndarray = "0.9"
+blas = "0.15"
+
+[dependencies.ndarray]
+version = "0.9"
+features = ["blas"]
 
 [dependencies.serde]
 version = "0.9"
@@ -26,5 +30,4 @@ version = "0.9"
 optional = true
 
 [features]
-blas = ["ndarray/blas"]
 serde_support = ["serde", "serde_derive", "ndarray/serde"]
