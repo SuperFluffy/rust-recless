@@ -17,5 +17,14 @@ name = "recless"
 [dependencies]
 ndarray = "0.9"
 
+[dependencies.serde]
+version = "0.9"
+optional = true
+
+[dependencies.serde_derive]
+version = "0.9"
+optional = true
+
 [features]
 blas = ["ndarray/blas"]
+serde_support = ["serde", "serde_derive", "ndarray/serde"]

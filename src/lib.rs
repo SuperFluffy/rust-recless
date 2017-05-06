@@ -1,6 +1,13 @@
 #[macro_use(azip)]
 extern crate ndarray;
 
+#[cfg(feature = "serde")]
+extern crate serde;
+
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde_derive;
+
 use ndarray::prelude::*;
 use ndarray::Data;
 use ndarray::linalg::{
@@ -16,6 +23,7 @@ use ndarray::linalg::{
 /// The implementation here does not implicitly take time into account. By making a choice of the
 /// forgetting factor λ < 1 and shifting down old values of the input vector manually, the user can
 /// get this algorithm to behave accordingly.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rls<F> {
 
     /// The inverse forgetting factor λ^{-1}.
@@ -45,6 +53,7 @@ pub struct Rls<F> {
 }
 
 impl<F: NdFloat> Rls<F> {
+
     /// Constructs a new Rls object with initialization factor δ and a weight vector of length n.
     pub fn new(initialization_factor: F, forgetting_factor: F, n: usize) -> Self {
         let weight = Array1::zeros(n);
@@ -117,6 +126,7 @@ impl<F: NdFloat> Rls<F> {
 }
 
 impl<T> Rls<T> {
+
     /// Returns a reference to the gain vector.
     pub fn gain_ref(&self) -> &Array1<T> {
         &self.gain
