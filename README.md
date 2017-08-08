@@ -8,6 +8,7 @@ It is using `ndarray` for its vector and matrix data structures.
 
 # Recent releases
 
++ 0.3.0: Dependency bump & don't choose `blas` backend, but let the consumer of the library decide which to link
 + 0.2.0: Bump all dependencies
 + 0.1.3:
     + the gain vector is now correctly calculated and not based on its old value;
