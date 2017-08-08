@@ -15,7 +15,7 @@ keywords = ["filters", "learning", "regression", "data", "kalman"]
 name = "recless"
 
 [dependencies]
-blas = "0.15"
+blas = { version = "0.16", default-features = false }
 
 [dependencies.ndarray]
 version = "0.10"

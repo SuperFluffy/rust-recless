@@ -127,18 +127,20 @@ macro_rules! impl_update {
 
                 self.temp_mat.fill(0.0);
                 let temp_mat_stride = self.temp_mat.strides()[0];
-                $fn(
-                    blas::c::Layout::RowMajor,
-                    self.gain.dim() as i32,
-                    self.temp_vec.dim() as i32,
-                    1.0,
-                    self.gain.as_slice().unwrap(),
-                    self.gain.strides()[0] as i32,
-                    self.temp_vec.as_slice().unwrap(),
-                    self.gain.strides()[0] as i32,
-                    self.temp_mat.as_slice_mut().unwrap(),
-                    temp_mat_stride as i32,
-                );
+                unsafe {
+                    $fn(
+                        blas::c::Layout::RowMajor,
+                        self.gain.dim() as i32,
+                        self.temp_vec.dim() as i32,
+                        1.0,
+                        self.gain.as_slice().unwrap(),
+                        self.gain.strides()[0] as i32,
+                        self.temp_vec.as_slice().unwrap(),
+                        self.gain.strides()[0] as i32,
+                        self.temp_mat.as_slice_mut().unwrap(),
+                        temp_mat_stride as i32,
+                    );
+                }
                 self.inverse_correlation -= &self.temp_mat;
                 self.inverse_correlation *= self.inv_forgetting_factor;
             }
